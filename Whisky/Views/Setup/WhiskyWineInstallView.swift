@@ -55,7 +55,7 @@ struct WhiskyWineInstallView: View {
         .frame(width: 400, height: 200)
         .onAppear {
             Task {
-                let result = await WhiskyWineInstaller.install(from: tarLocation)
+                let result = WhiskyWineInstaller.install(from: tarLocation)
                 await MainActor.run {
                     switch result {
                     case .success:
@@ -67,7 +67,7 @@ struct WhiskyWineInstallView: View {
                     }
                 }
                 sleep(2)
-                await proceed()
+                proceed()
             }
         }
     }

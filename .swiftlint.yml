@@ -4,6 +4,10 @@ opt_in_rules:
 
 excluded:
   - .build
+  - WhiskyKit/.build
+  - DerivedData
+  - Carthage
+  - Pods
 
 file_header:
     severity: error
