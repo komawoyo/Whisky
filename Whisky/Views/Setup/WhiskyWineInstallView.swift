@@ -18,6 +18,9 @@
 
 import SwiftUI
 import WhiskyKit
+import os.log
+
+private let logger = Logger(subsystem: "com.isaacmarovitz.Whisky", category: "WhiskyWineInstallView")
 
 struct WhiskyWineInstallView: View {
     @State var installing: Bool = true
@@ -51,10 +54,17 @@ struct WhiskyWineInstallView: View {
         }
         .frame(width: 400, height: 200)
         .onAppear {
-            Task.detached {
-                await WhiskyWineInstaller.install(from: tarLocation)
+            Task {
+                let result = await WhiskyWineInstaller.install(from: tarLocation)
                 await MainActor.run {
-                    installing = false
+                    switch result {
+                    case .success:
+                        logger.info("WhiskyWine installed successfully")
+                        installing = false
+                    case .failure(let error):
+                        logger.error("Failed to install WhiskyWine: \(error.localizedDescription)")
+                        installing = false
+                    }
                 }
                 sleep(2)
                 await proceed()

@@ -18,6 +18,9 @@
 
 import SwiftUI
 import WhiskyKit
+import os.log
+
+private let logger = Logger(subsystem: "com.isaacmarovitz.Whisky", category: "WelcomeView")
 
 struct WelcomeView: View {
     @State var rosettaInstalled: Bool?
@@ -146,7 +149,13 @@ struct InstallStatusView: View {
 
     func uninstall() {
         if name == "WhiskyWine" {
-            WhiskyWineInstaller.uninstall()
+            let result = WhiskyWineInstaller.uninstall()
+            switch result {
+            case .success:
+                logger.info("WhiskyWine uninstalled successfully")
+            case .failure(let error):
+                logger.error("Failed to uninstall WhiskyWine: \(error.localizedDescription)")
+            }
         }
 
         shouldCheckInstallStatus.toggle()

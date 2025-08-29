@@ -20,6 +20,19 @@ import Foundation
 import SwiftUI
 import os.log
 
+/// Information about a pinned program with its associated program and unique identifier
+public struct PinnedProgramInfo {
+    public let pin: PinnedProgram
+    public let program: Program
+    public let id: String
+
+    public init(pin: PinnedProgram, program: Program, id: String) {
+        self.pin = pin
+        self.program = program
+        self.id = id
+    }
+}
+
 // swiftlint:disable:next todo
 // TODO: Should not be unchecked!
 public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, Comparable, @unchecked Sendable {
@@ -39,11 +52,11 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
     public var isAvailable: Bool = false
 
     // Performance optimization: Cache pinned programs to avoid repeated computation
-    private var cachedPinnedPrograms: [(pin: PinnedProgram, program: Program, id: String)]?
+    private var cachedPinnedPrograms: [PinnedProgramInfo]?
     private var lastProgramsUpdate: Date?
 
     /// All pins with their associated programs
-    public var pinnedPrograms: [(pin: PinnedProgram, program: Program, id: String)] { // swiftlint:disable:this large_tuple
+    public var pinnedPrograms: [PinnedProgramInfo] {
         // Performance optimization: Cache computation to avoid repeated file system checks
         let currentTime = Date()
         if let cached = cachedPinnedPrograms,
@@ -52,10 +65,10 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
             return cached
         }
 
-        let result = settings.pins.compactMap { pin -> (PinnedProgram, Program, String)? in
+        let result = settings.pins.compactMap { pin -> PinnedProgramInfo? in
             let exists = FileManager.default.fileExists(atPath: pin.url?.path(percentEncoded: false) ?? "")
             guard let program = programs.first(where: { $0.url == pin.url && exists }) else { return nil }
-            return (pin, program, "\(pin.name)//\(program.url)")
+            return PinnedProgramInfo(pin: pin, program: program, id: "\(pin.name)//\(program.url)")
         }
 
         cachedPinnedPrograms = result

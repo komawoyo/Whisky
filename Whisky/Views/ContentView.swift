@@ -20,6 +20,9 @@ import SwiftUI
 import UniformTypeIdentifiers
 import WhiskyKit
 import SemanticVersion
+import os.log
+
+private let logger = Logger(subsystem: "com.isaacmarovitz.Whisky", category: "ContentView")
 
 struct ContentView: View {
     @AppStorage("selectedBottleURL") private var selectedBottleURL: URL?
@@ -125,8 +128,16 @@ struct ContentView: View {
                 let response = alert.runModal()
 
                 if response == .alertFirstButtonReturn {
-                    WhiskyWineInstaller.uninstall()
-                    showSetup = true
+                    let result = WhiskyWineInstaller.uninstall()
+                    switch result {
+                    case .success:
+                        logger.info("WhiskyWine uninstalled successfully")
+                        showSetup = true
+                    case .failure(let error):
+                        logger.error("Failed to uninstall WhiskyWine: \(error.localizedDescription)")
+                        // Still show setup even on failure
+                        showSetup = true
+                    }
                 }
             }
         }

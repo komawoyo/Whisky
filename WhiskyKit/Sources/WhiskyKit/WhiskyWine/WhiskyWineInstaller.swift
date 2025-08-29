@@ -95,7 +95,7 @@ public class WhiskyWineInstaller {
                             return
                         }
                         if let error = error {
-                            logger.error("Network error while checking WhiskyWine version: \(error.localizedDescription)")
+                            logger.error("Network error checking WhiskyWine version: \(error.localizedDescription)")
                         }
                     } catch {
                         logger.error("Failed to decode WhiskyWine version data: \(error.localizedDescription)")
