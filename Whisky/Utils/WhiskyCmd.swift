@@ -30,23 +30,30 @@ class WhiskyCmd {
             """
             // swiftlint:enable line_length
 
-            var error: NSDictionary?
-            // Use AppleScript because somehow in 2023 Apple doesn't have good privileged file ops APIs
-            if let appleScript = NSAppleScript(source: script) {
-                appleScript.executeAndReturnError(&error)
+            // Swift 6.0: Handle AppleScript execution with proper QoS management
+            await withCheckedContinuation { continuation in
+                DispatchQueue.global(qos: .userInitiated).async {
+                    var error: NSDictionary?
+                    var result: NSAppleEventDescriptor?
 
-                if let error = error {
-                    print(error)
-                    if let description = error["NSAppleScriptErrorMessage"] as? String {
-                        await MainActor.run {
-                            let alert = NSAlert()
-                            alert.messageText = String(localized: "alert.message")
-                            alert.informativeText = String(localized: "alert.info")
-                                + description
-                            alert.alertStyle = .critical
-                            alert.addButton(withTitle: String(localized: "button.ok"))
-                            alert.runModal()
+                    if let appleScript = NSAppleScript(source: script) {
+                        result = appleScript.executeAndReturnError(&error)
+                    }
+
+                    Task { @MainActor in
+                        if let error = error {
+                            print(error)
+                            if let description = error["NSAppleScriptErrorMessage"] as? String {
+                                let alert = NSAlert()
+                                alert.messageText = String(localized: "alert.message")
+                                alert.informativeText = String(localized: "alert.info")
+                                    + description
+                                alert.alertStyle = .critical
+                                alert.addButton(withTitle: String(localized: "button.ok"))
+                                alert.runModal()
+                            }
                         }
+                        continuation.resume()
                     }
                 }
             }
