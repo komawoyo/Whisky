@@ -1,0 +1,65 @@
+name: Build & Test
+
+concurrency:
+  group: pr-checks-${{ github.event.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+
+    - name: Cache Swift packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          .build
+          ~/Library/Caches/org.swift.swiftpm
+        key: ${{ runner.os }}-swiftpm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-swiftpm-
+
+    - name: Build WhiskyKit
+      run: |
+        cd WhiskyKit
+        swift build --configuration release
+
+    - name: Run WhiskyKit tests
+      run: |
+        cd WhiskyKit
+        swift test
+
+    - name: Build Whisky app
+      run: |
+        xcodebuild -project Whisky.xcodeproj -scheme Whisky -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+    - name: Build WhiskyCmd
+      run: |
+        xcodebuild -project Whisky.xcodeproj -scheme WhiskyCmd -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+    - name: Build WhiskyThumbnail
+      run: |
+        xcodebuild -project Whisky.xcodeproj -scheme WhiskyThumbnail -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: whisky-build-artifacts
+        path: |
+          WhiskyKit/.build
+        retention-days: 7

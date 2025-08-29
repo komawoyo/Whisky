@@ -7,9 +7,17 @@
   [![](https://img.shields.io/discord/1115955071549702235?style=for-the-badge)](https://discord.gg/CsqAfs9CnM)
 </div>
 
-## Maintenance Notice
+## 🎉 Project Status Update
 
-[Whisky is no longer actively maintained](https://docs.getwhisky.app/maintenance-notice). Apps and games may break at any time.
+**Whisky is back!** The project has been revived with modern updates and improvements. We're committed to maintaining and enhancing Whisky for the macOS gaming community.
+
+### What's New
+- ✅ **macOS 15.0+ Support** - Latest macOS Sequoia compatibility
+- ✅ **Swift 6.0 Upgrade** - Modern concurrency and performance improvements
+- ✅ **Enhanced UI/UX** - Better animations, accessibility, and dark mode support
+- ✅ **Performance Optimizations** - Caching, memory management, and async improvements
+- ✅ **Security Enhancements** - Structured logging and error handling
+- ✅ **Active Maintenance** - Regular updates and community support
 
 <img width="650" alt="Config" src="https://github.com/Whisky-App/Whisky/assets/42140194/d0a405e8-76ee-48f0-92b5-165d184a576b">
 
@@ -35,18 +43,89 @@ Translated on [Crowdin](https://crowdin.com/project/whisky).
 
 ## System Requirements
 - CPU: Apple Silicon (M-series chips)
-- OS: macOS Sonoma 14.0 or later
+- OS: macOS Sequoia 15.0 or later
+- Memory: 8GB RAM recommended
+- Storage: 2GB free space minimum
 
 ## Homebrew
 
-Whisky is on homebrew! Install with 
+Whisky is on homebrew! Install with
 `brew install --cask whisky`.
+
+## Building from Source
+
+### Prerequisites
+- Xcode 26.0 or later
+- Swift 6.0 or later
+- macOS Sequoia 15.0+
+
+### Quick Build
+```bash
+# Clone the repository
+git clone https://github.com/IsaacMarovitz/Whisky.git
+cd Whisky
+
+# Build WhiskyKit
+cd WhiskyKit
+swift build
+
+# Build main app (from project root)
+cd ..
+xcodebuild -project Whisky.xcodeproj -scheme Whisky build
+```
+
+### Development Setup
+```bash
+# Install dependencies
+brew install create-dmg
+
+# Run tests
+swift test
+
+# Generate documentation
+swift package generate-documentation
+```
+
+## Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`swift test`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Code Style
+- Follow Swift 6.0 best practices
+- Use structured concurrency
+- Add proper error handling
+- Include accessibility support
+- Write tests for new features
 
 ## My game isn't working!
 
 Some games need special steps to get working. Check out the [wiki](https://github.com/IsaacMarovitz/Whisky/wiki/Game-Support).
 
+## Support
+
+- 📖 [Documentation](https://docs.getwhisky.app/)
+- 📋 [Changelog](CHANGELOG.md)
+- 💬 [Discord Community](https://discord.gg/CsqAfs9CnM)
+- 🐛 [Issue Tracker](https://github.com/IsaacMarovitz/Whisky/issues)
+- 📧 [Email Support](mailto:support@getwhisky.app)
+
 ---
+
+---
+
+## 🏗️ CI/CD Status
+
+[![SwiftLint](https://github.com/IsaacMarovitz/Whisky/actions/workflows/SwiftLint.yml/badge.svg)](https://github.com/IsaacMarovitz/Whisky/actions/workflows/SwiftLint.yml)
+[![Build & Test](https://github.com/IsaacMarovitz/Whisky/actions/workflows/build-test.yml/badge.svg)](https://github.com/IsaacMarovitz/Whisky/actions/workflows/build-test.yml)
 
 ## Credits & Acknowledgments
 

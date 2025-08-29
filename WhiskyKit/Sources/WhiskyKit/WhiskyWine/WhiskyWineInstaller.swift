@@ -18,6 +18,10 @@
 
 import Foundation
 import SemanticVersion
+import os.log
+
+// Enhanced error handling with structured logging
+private let logger = Logger(subsystem: "com.isaacmarovitz.Whisky", category: "WhiskyWineInstaller")
 
 public class WhiskyWineInstaller {
     /// The Whisky application folder
@@ -35,28 +39,40 @@ public class WhiskyWineInstaller {
         return whiskyWineVersion() != nil
     }
 
-    public static func install(from: URL) {
+    public static func install(from: URL) -> Result<Void, Error> {
+        // Enhanced error handling with Result type and structured logging
         do {
             if !FileManager.default.fileExists(atPath: applicationFolder.path) {
                 try FileManager.default.createDirectory(at: applicationFolder, withIntermediateDirectories: true)
+                logger.info("Created WhiskyWine application folder")
             } else {
                 // Recreate it
+                logger.info("Recreating WhiskyWine application folder")
                 try FileManager.default.removeItem(at: applicationFolder)
                 try FileManager.default.createDirectory(at: applicationFolder, withIntermediateDirectories: true)
             }
 
+            logger.info("Extracting WhiskyWine archive")
             try Tar.untar(tarBall: from, toURL: applicationFolder)
             try FileManager.default.removeItem(at: from)
+            logger.info("WhiskyWine installation completed successfully")
+            return .success(())
         } catch {
-            print("Failed to install WhiskyWine: \(error)")
+            logger.error("Failed to install WhiskyWine: \(error.localizedDescription)")
+            return .failure(error)
         }
     }
 
-    public static func uninstall() {
+    public static func uninstall() -> Result<Void, Error> {
+        // Enhanced error handling with Result type and structured logging
         do {
+            logger.info("Uninstalling WhiskyWine")
             try FileManager.default.removeItem(at: libraryFolder)
+            logger.info("WhiskyWine uninstalled successfully")
+            return .success(())
         } catch {
-            print("Failed to uninstall WhiskyWine: \(error)")
+            logger.error("Failed to uninstall WhiskyWine: \(error.localizedDescription)")
+            return .failure(error)
         }
     }
 
@@ -79,10 +95,10 @@ public class WhiskyWineInstaller {
                             return
                         }
                         if let error = error {
-                            print(error)
+                            logger.error("Network error while checking WhiskyWine version: \(error.localizedDescription)")
                         }
                     } catch {
-                        print(error)
+                        logger.error("Failed to decode WhiskyWine version data: \(error.localizedDescription)")
                     }
 
                     continuation.resume(returning: nil)
@@ -110,7 +126,7 @@ public class WhiskyWineInstaller {
             let info = try decoder.decode(WhiskyWineVersion.self, from: data)
             return info.version
         } catch {
-            print(error)
+            logger.error("Failed to read WhiskyWine version: \(error.localizedDescription)")
             return nil
         }
     }

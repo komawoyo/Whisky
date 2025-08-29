@@ -20,21 +20,43 @@ import Foundation
 import SemanticVersion
 import WhiskyKit
 
-// swiftlint:disable:next todo
-// TODO: Don't use unchecked!
-final class BottleVM: ObservableObject, @unchecked Sendable {
+// Swift 6.0: Use proper actor isolation instead of @unchecked Sendable
+@MainActor
+final class BottleVM: ObservableObject {
     @MainActor static let shared = BottleVM()
 
     var bottlesList = BottleData()
     @Published var bottles: [Bottle] = []
 
+    // Performance optimization: Cache bottle data to avoid unnecessary reloads
+    private var lastLoadTime: Date?
+    private let cacheValidityInterval: TimeInterval = 5.0 // 5 seconds
+    private var cachedActiveCount: Int?
+
     @MainActor
-    func loadBottles() {
+    func loadBottles(forceReload: Bool = false) {
+        // Performance optimization: Use caching to avoid unnecessary file system operations
+        if !forceReload,
+           let lastLoad = lastLoadTime,
+           Date().timeIntervalSince(lastLoad) < cacheValidityInterval {
+            return // Use cached data
+        }
+
         bottles = bottlesList.loadBottles()
+        lastLoadTime = Date()
+        // Invalidate cached count when bottles change
+        cachedActiveCount = nil
     }
 
     func countActive() -> Int {
-        return bottles.filter { $0.isAvailable == true }.count
+        // Performance optimization: Cache active count to avoid repeated filtering
+        if let cached = cachedActiveCount {
+            return cached
+        }
+
+        let count = bottles.filter { $0.isAvailable == true }.count
+        cachedActiveCount = count
+        return count
     }
 
     func createNewBottle(bottleName: String, winVersion: WinVersion, bottleURL: URL) -> URL {

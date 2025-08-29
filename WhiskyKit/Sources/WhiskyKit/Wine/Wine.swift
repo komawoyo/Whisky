@@ -208,10 +208,10 @@ public class Wine {
         return try await runWine(["cmd", "/c", url.path(percentEncoded: false)], bottle: bottle)
     }
 
-    public static func killBottle(bottle: Bottle) throws {
-        Task.detached(priority: .userInitiated) {
-            try await runWineserver(["-k"], bottle: bottle)
-        }
+    public static func killBottle(bottle: Bottle) async throws {
+        // Swift 6.0: Use structured concurrency instead of detached tasks
+        // Explicitly ignore the result as we don't need the output for kill command
+        _ = try await runWineserver(["-k"], bottle: bottle)
     }
 
     public static func enableDXVK(bottle: Bottle) throws {

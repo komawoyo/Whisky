@@ -29,8 +29,26 @@ struct BottleListEntry: View {
     @State private var name: String = ""
 
     var body: some View {
-        Text(name)
-            .opacity(bottle.isAvailable ? 1.0 : 0.5)
+        HStack {
+            Circle()
+                .fill(bottle.isAvailable ? Color.accentColor : Color.secondary)
+                .frame(width: 8, height: 8)
+                .accessibilityHidden(true)
+
+            Text(name)
+                .accessibilityLabel("\(name) bottle")
+                .accessibilityHint(bottle.isAvailable ? "Available bottle, double tap to select" : "Unavailable bottle")
+                .accessibilityValue(bottle.isAvailable ? "Available" : "Unavailable")
+
+            Spacer()
+
+            if bottle.inFlight {
+                ProgressView()
+                    .controlSize(.small)
+                    .accessibilityLabel("Bottle is loading")
+            }
+        }
+        .opacity(bottle.isAvailable ? 1.0 : 0.5)
             .onChange(of: refresh, initial: true) {
                 name = bottle.settings.name
             }

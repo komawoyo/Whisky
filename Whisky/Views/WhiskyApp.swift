@@ -88,12 +88,16 @@ struct WhiskyApp: App {
                 }
                 .keyboardShortcut("L", modifiers: [.command])
                 Button("kill.bottles") {
-                    WhiskyApp.killBottles()
+                    Task {
+                        await WhiskyApp.killBottles()
+                    }
                 }
                 .keyboardShortcut("K", modifiers: [.command, .shift])
                 Button("wine.clearShaderCaches") {
-                    WhiskyApp.killBottles() // Better not make things more complicated for ourselves
-                    WhiskyApp.wipeShaderCaches()
+                    Task {
+                        await WhiskyApp.killBottles() // Better not make things more complicated for ourselves
+                        WhiskyApp.wipeShaderCaches()
+                    }
                 }
             }
             CommandGroup(replacing: .help) {
@@ -119,12 +123,17 @@ struct WhiskyApp: App {
         }
     }
 
-    static func killBottles() {
-        for bottle in BottleVM.shared.bottles {
-            do {
-                try Wine.killBottle(bottle: bottle)
-            } catch {
-                print("Failed to kill bottle: \(error)")
+    static func killBottles() async {
+        // Swift 6.0: Use async/await for better error handling and concurrency
+        await withTaskGroup(of: Void.self) { group in
+            for bottle in BottleVM.shared.bottles {
+                group.addTask {
+                    do {
+                        try await Wine.killBottle(bottle: bottle)
+                    } catch {
+                        print("Failed to kill bottle: \(error)")
+                    }
+                }
             }
         }
     }

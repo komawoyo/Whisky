@@ -44,7 +44,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         if UserDefaults.standard.bool(forKey: "killOnTerminate") {
-            WhiskyApp.killBottles()
+            Task {
+                await WhiskyApp.killBottles()
+            }
         }
     }
 

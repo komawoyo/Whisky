@@ -28,18 +28,39 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
     @Published public var settings: BottleSettings {
         didSet { saveSettings() }
     }
-    @Published public var programs: [Program] = []
+    @Published public var programs: [Program] = [] {
+        didSet {
+            // Invalidate cache when programs change
+            cachedPinnedPrograms = nil
+            lastProgramsUpdate = nil
+        }
+    }
     @Published public var inFlight: Bool = false
     public var isAvailable: Bool = false
 
+    // Performance optimization: Cache pinned programs to avoid repeated computation
+    private var cachedPinnedPrograms: [(pin: PinnedProgram, program: Program, id: String)]?
+    private var lastProgramsUpdate: Date?
+
     /// All pins with their associated programs
-    public var pinnedPrograms: [(pin: PinnedProgram, program: Program, // swiftlint:disable:this large_tuple
-                                 id: String)] {
-        return settings.pins.compactMap { pin in
+    public var pinnedPrograms: [(pin: PinnedProgram, program: Program, id: String)] { // swiftlint:disable:this large_tuple
+        // Performance optimization: Cache computation to avoid repeated file system checks
+        let currentTime = Date()
+        if let cached = cachedPinnedPrograms,
+           let lastUpdate = lastProgramsUpdate,
+           currentTime.timeIntervalSince(lastUpdate) < 2.0 { // Cache for 2 seconds
+            return cached
+        }
+
+        let result = settings.pins.compactMap { pin in
             let exists = FileManager.default.fileExists(atPath: pin.url?.path(percentEncoded: false) ?? "")
             guard let program = programs.first(where: { $0.url == pin.url && exists }) else { return nil }
             return (pin, program, "\(pin.name)//\(program.url)")
         }
+
+        cachedPinnedPrograms = result
+        lastProgramsUpdate = currentTime
+        return result
     }
 
     public init(bottleUrl: URL, inFlight: Bool = false, isAvailable: Bool = false) {

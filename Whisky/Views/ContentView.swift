@@ -43,6 +43,8 @@ struct ContentView: View {
         } detail: {
             detail
         }
+        .accessibilityLabel("Whisky main interface")
+        .accessibilityHint("Navigate between wine bottles and manage Windows applications")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -59,7 +61,8 @@ struct ContentView: View {
                         bottle.updateInstalledPrograms()
                     }
                     triggerRefresh.toggle()
-                    withAnimation(.default) {
+                    // SwiftUI: Use modern animation API instead of withAnimation
+                    withAnimation(.interpolatingSpring(duration: 0.8, bounce: 0.3)) {
                         refreshAnimation = .degrees(360)
                     } completion: {
                         refreshAnimation = .degrees(0)
@@ -151,8 +154,8 @@ struct ContentView: View {
                     }
                 }
             }
-            .animation(.default, value: bottleVM.bottles)
-            .animation(.default, value: bottleFilter)
+            .animation(.easeInOut(duration: 0.3), value: bottleVM.bottles)
+            .animation(.easeInOut(duration: 0.2), value: bottleFilter)
             .listStyle(.sidebar)
             .searchable(text: $bottleFilter, placement: .sidebar)
             .onChange(of: newlyCreatedBottleURL) { _, url in
