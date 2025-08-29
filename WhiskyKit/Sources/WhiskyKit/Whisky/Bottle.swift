@@ -52,7 +52,7 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
             return cached
         }
 
-        let result = settings.pins.compactMap { pin in
+        let result = settings.pins.compactMap { pin -> (PinnedProgram, Program, String)? in
             let exists = FileManager.default.fileExists(atPath: pin.url?.path(percentEncoded: false) ?? "")
             guard let program = programs.first(where: { $0.url == pin.url && exists }) else { return nil }
             return (pin, program, "\(pin.name)//\(program.url)")
