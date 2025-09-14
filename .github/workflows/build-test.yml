@@ -9,8 +9,8 @@ on:
 
 env:
   BUILDROOT: $GITHUB_WORKSPACE/build
-  WINE_INSTALLROOT: WhiskyKit/.build
-  ARCHIVE_ROOT: WhiskyKit
+  ARCHIVE_NAME: WhiskyKit
+  BUILD_ROOT: WhiskyKit/.build/arm64-apple-macosx/release/WhiskyKit.build
   
 jobs:
   build-and-test:
@@ -57,11 +57,11 @@ jobs:
     - name: Tar wine
       continue-on-error: true
       run: |
-        tar -czvf ${{ env.WINE_INSTALLATION }}.tar.gz ${{ env.ARCHIVE_ROOT }}
+        tar -czvf ${{ env.ARCHIVE_NAME }}.tar.gz Whisky WhiskyCmd WhiskyKit
 
     - name: Uploading 
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.WINE_INSTALLATION }}
-        path: ${{ env.WINE_INSTALLATION }}.tar.gz
+        name: ${{ env.ARCHIVE_NAME }}
+        path: ${{ env.ARCHIVE_NAME }}.tar.gz
         retention-days: 7
