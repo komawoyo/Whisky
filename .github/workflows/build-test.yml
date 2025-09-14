@@ -7,6 +7,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  BUILDROOT: $GITHUB_WORKSPACE/build
+  WINE_INSTALLROOT: WhiskyKit/.build
+  ARCHIVE_ROOT: WhiskyKit
+  
 jobs:
   build-and-test:
     runs-on: macos-latest
@@ -49,11 +54,14 @@ jobs:
         xcodebuild -project Whisky.xcodeproj -scheme WhiskyThumbnail -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
         ls
 
-    - name: Archive build artifacts
+    - name: Tar wine
+      continue-on-error: true
+      run: |
+        tar -czvf ${{ env.WINE_INSTALLATION }}.tar.gz ${{ env.ARCHIVE_ROOT }}
+
+    - name: Uploading 
       uses: actions/upload-artifact@v4
       with:
-        name: whisky-build-artifacts
-        path: |
-          Whisky.build/
-      
+        name: ${{ env.WINE_INSTALLATION }}
+        path: ${{ env.WINE_INSTALLATION }}.tar.gz
         retention-days: 7
