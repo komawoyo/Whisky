@@ -53,5 +53,6 @@ jobs:
       with:
         name: whisky-build-artifacts
         path: |
-          WhiskyKit/.build
+          Whisky.build/
+      
         retention-days: 7
