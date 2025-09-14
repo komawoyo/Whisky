@@ -47,6 +47,7 @@ jobs:
     - name: Build WhiskyThumbnail
       run: |
         xcodebuild -project Whisky.xcodeproj -scheme WhiskyThumbnail -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        ls
 
     - name: Archive build artifacts
       uses: actions/upload-artifact@v4
