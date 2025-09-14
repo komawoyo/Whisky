@@ -24,6 +24,9 @@ jobs:
       with:
         xcode-version: latest-stable
 
+    - name: SwiftLint
+      uses: norio-nomura/action-swiftlint@v6
+        
     - name: Cache Swift packages
       uses: actions/cache@v3
       with:
