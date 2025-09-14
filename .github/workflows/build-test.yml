@@ -20,9 +20,11 @@ jobs:
       with:
         xcode-version: latest-stable
 
-    - name: SwiftLint
-      uses: norio-nomura/action-swiftlint@v3.2.1
-
+    - name: Install or update Homebrew dependencies
+      run: |
+        brew update
+        brew install swiftlint
+          
     - name: Build WhiskyKit
       run: |
         cd WhiskyKit
