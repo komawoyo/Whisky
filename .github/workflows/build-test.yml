@@ -1,9 +1,5 @@
 name: Build & Test
 
-concurrency:
-  group: pr-checks-${{ github.event.number }}
-  cancel-in-progress: true
-
 on:
   pull_request:
     branches: [ main, develop ]
@@ -25,17 +21,7 @@ jobs:
         xcode-version: latest-stable
 
     - name: SwiftLint
-      uses: norio-nomura/action-swiftlint@v6
-        
-    - name: Cache Swift packages
-      uses: actions/cache@v3
-      with:
-        path: |
-          .build
-          ~/Library/Caches/org.swift.swiftpm
-        key: ${{ runner.os }}-swiftpm-${{ hashFiles('**/Package.resolved') }}
-        restore-keys: |
-          ${{ runner.os }}-swiftpm-
+      uses: norio-nomura/action-swiftlint@v3.2.1
 
     - name: Build WhiskyKit
       run: |
